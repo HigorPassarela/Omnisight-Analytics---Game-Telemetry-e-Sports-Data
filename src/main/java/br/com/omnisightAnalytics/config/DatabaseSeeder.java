@@ -35,17 +35,16 @@ public class DatabaseSeeder implements CommandLineRunner {
     public void run(String... args) {
         long count = mongoTemplate.getCollection("match_events").countDocuments();
         if (count > 0) {
-            log.info("O banco já possui {} registros. Seeder ignorado.", count);
+            log.info("Database already contains {} records. Seeder skipped.", count);
             return;
         }
 
-        log.info("Iniciando a geração de dados. Por favor, aguarde...");
+        log.info("Starting data generation. Please wait...");
 
-        int totalRecords = 200_000; // Reduzido para poupar armazenamento
+        int totalRecords = 200_000;
         int batchSize = 10_000;
         int batches = totalRecords / batchSize;
 
-        // Gerando um pool menor de IDs para termos dados mais "repetidos" e densos
         List<String> matchIds = generateIds(2_000);
         List<String> playerIds = generateIds(5_000);
         String[] eventTypes = {"kill", "death", "assist", "item_buy", "objective_capture"};
@@ -70,10 +69,10 @@ public class DatabaseSeeder implements CommandLineRunner {
             }
 
             mongoTemplate.insertAll(batch);
-            log.info("Lote {}/{} inserido com sucesso ({} registros totais).", (i + 1), batches, (i + 1) * batchSize);
+            log.info("Batch {}/{} inserted successfully ({} total records).", (i + 1), batches, (i + 1) * batchSize);
         }
 
-        log.info("✅ Seeder finalizado! 200.000 registros inseridos no MongoDB.");
+        log.info("Seeder finished! 200,000 records inserted into MongoDB.");
     }
 
     private List<String> generateIds(int amount) {
