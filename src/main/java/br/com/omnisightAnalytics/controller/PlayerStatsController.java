@@ -18,7 +18,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/stats")
-@Tag(name = "Players Statistics", description = "Endpoints for analisys players datas")
+@Tag(name = "Players Statistics", description = "Endpoint for analyzing player data")
 public class PlayerStatsController {
 
     private static final Logger log = LoggerFactory.getLogger(PlayerStatsController.class);
@@ -29,47 +29,47 @@ public class PlayerStatsController {
     }
 
     @GetMapping("/top-players")
-    @Operation(summary = "Search top players", description = "Calculate K/D Ration and return the best players")
+    @Operation(summary = "Get top players", description = "Calculates the K/D Ration and returns the best players")
     public ResponseEntity<List<PlayerStatsDTO>> getTopPlayers(
             @RequestParam(defaultValue = "5") int minKills,
             @RequestParam(defaultValue = "10") int limit) {
 
-        log.info("Search top {} players with minimal {} kills...", limit, minKills);
+        log.info("Searching for top {} players with a minimum of {} kills...", limit, minKills);
 
         long startTime = System.currentTimeMillis();
         List<PlayerStatsDTO> topPlayers = repository.findTopPlayersByKdRatio(minKills, limit);
         long endTime = System.currentTimeMillis();
 
-        log.info("Query executing in {} ms", (endTime - startTime));
+        log.info("Top players query executed in {} ms", (endTime - startTime));
 
         return ResponseEntity.ok(topPlayers);
     }
 
     @GetMapping("/heatmap")
-    @Operation(summary = "Heatmap deaths")
+    @Operation(summary = "Death Heatmap", description = "Groups death events by map quadrants using database math operations")
     public ResponseEntity<List<HeatmapZoneDTO>> getHeatmap(
             @RequestParam(defaultValue = "50") int gridSize,
             @RequestParam(defaultValue = "10") int limit
     ) {
-        log.info("Generate heatmap with {} size...", gridSize);
+        log.info("Generating heatmap with grid size {}...", gridSize);
         long startTime = System.currentTimeMillis();
 
         List<HeatmapZoneDTO> heatmap = repository.findDeathHeatMap(gridSize, limit);
 
-        log.info("Heatmap 1uery executing in {} ms", (System.currentTimeMillis() - startTime));
+        log.info("Heatmap query executed in {} ms", (System.currentTimeMillis() - startTime));
         return ResponseEntity.ok(heatmap);
     }
 
     @GetMapping("/dashboard")
-    @Operation(summary = "Dashboard facet")
+    @Operation(summary = "Faceted Dashboard", description = "Retrieves multiple aggregated metrics (event distribution and peak hour) in a single optimized query")
     public ResponseEntity<DashboardFacetedDTO> getDashboard() {
 
-        log.info("Generating dashboard with $facet...");
+        log.info("Generating faceted dashboard...");
         long startTime = System.currentTimeMillis();
 
         DashboardFacetedDTO dashboard = repository.getDashboardStats();
 
-        log.info("Dashboard query (facet) executing in {} ms", (System.currentTimeMillis() - startTime));
+        log.info("Dashboard query ($facet) executed in {} ms", (System.currentTimeMillis() - startTime));
         return ResponseEntity.ok(dashboard);
     }
 }
